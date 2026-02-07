@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 圆润可爱的五角星 -->
+  <path
+    d="M50 10 L63 40 L95 40 L68 58 L80 88 L50 70 L20 88 L32 58 L5 40 L37 40 Z"
+    fill="#FFD700"
+    stroke="#FF8C00"
+    stroke-width="6"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+  <!-- 添加圆角效果 -->
+  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="2" result="blur" />
+    <feComposite in="SourceGraphic" in2="blur" operator="atop" />
+  </filter>
+</svg>
