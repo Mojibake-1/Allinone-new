@@ -1,8 +1,8 @@
 /* SCENE MODULE */
 // 初始化Three.js的场景、相机和渲染器
 const scene = new THREE.Scene();
-// 默认背景色
-scene.background = new THREE.Color(0x000000);
+// 透明背景，显示页面底图
+scene.background = null;
 
 const modelContainer = document.getElementById('model-container');
 
@@ -42,10 +42,11 @@ function adjustCameraForMobile() {
 adjustCameraForMobile();
 
 // 渲染器
-const renderer = new THREE.WebGLRenderer({ antialias: true, physicallyCorrectLights: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, physicallyCorrectLights: true, alpha: true });
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
+renderer.setClearColor(0x000000, 0);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 updateRendererSize();
 
@@ -94,4 +95,30 @@ scene.add(pointLight1);
 
 const pointLight2 = new THREE.PointLight(0xffffff, 1.5, 10);
 pointLight2.position.set(-2, -2, 2);
-scene.add(pointLight2); 
+scene.add(pointLight2);
+
+const sceneThemeProfiles = {
+  dark: {
+    exposure: 1.0,
+    ambient: 1.0,
+    directional: 2.0,
+    point: 1.5
+  },
+  light: {
+    exposure: 1.2,
+    ambient: 1.35,
+    directional: 2.5,
+    point: 1.9
+  }
+};
+
+function applySceneThemeLighting(isDarkMode = document.documentElement.classList.contains('dark')) {
+  const profile = isDarkMode ? sceneThemeProfiles.dark : sceneThemeProfiles.light;
+  renderer.toneMappingExposure = profile.exposure;
+  ambientLight.intensity = profile.ambient;
+  directionalLight.intensity = profile.directional;
+  pointLight1.intensity = profile.point;
+  pointLight2.intensity = profile.point;
+}
+
+applySceneThemeLighting();
