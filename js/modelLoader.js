@@ -3,9 +3,13 @@ const loader = new THREE.GLTFLoader();
 const modelCacheMap = {}; // 缓存已经加载的模型
 let currentModel = null;  // 当前显示的模型
 let currentModelIndex = config.defaultIndex;
+let activeLoadToken = 0; // 仅允许最新一次加载请求渲染到场景
 
 function loadModel(index) {
   const modelInfo = config.models[index];
+  if (!modelInfo) return;
+  const loadToken = ++activeLoadToken;
+  currentModelIndex = index;
   
   // 更新导航圆点
   const dots = document.querySelectorAll('.model-dot');
@@ -28,6 +32,7 @@ function loadModel(index) {
 
   // 从缓存读取或加载新模型
   if (modelCacheMap[modelInfo.file]) {
+    if (loadToken !== activeLoadToken) return;
     const cachedModel = modelCacheMap[modelInfo.file];
     // 如果有SkeletonUtils，就用它来克隆
     const cloneModel = THREE.SkeletonUtils
@@ -35,7 +40,6 @@ function loadModel(index) {
       : cachedModel.clone();
     scene.add(cloneModel);
     currentModel = cloneModel;
-    currentModelIndex = index;
     return;
   }
 
@@ -43,7 +47,6 @@ function loadModel(index) {
     modelInfo.file,
     function (gltf) {
       const newModel = gltf.scene;
-      modelCacheMap[modelInfo.file] = newModel; // 缓存
 
       // 调整材质
       newModel.traverse((node) => {
@@ -77,10 +80,14 @@ function loadModel(index) {
       const scale = 3.0 / maxDim;
       newModel.scale.set(scale, scale, scale);
       newModel.rotation.y = -0.5;
+      modelCacheMap[modelInfo.file] = newModel; // 缓存
 
-      scene.add(newModel);
-      currentModel = newModel;
-      currentModelIndex = index;
+      if (loadToken !== activeLoadToken) return;
+      const cloneModel = THREE.SkeletonUtils
+        ? THREE.SkeletonUtils.clone(newModel)
+        : newModel.clone();
+      scene.add(cloneModel);
+      currentModel = cloneModel;
     },
     undefined,
     function (error) {
