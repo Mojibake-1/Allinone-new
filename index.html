@@ -103,12 +103,12 @@
     }
   </style>
   <!-- 引入自定义样式 -->
-  <link rel="stylesheet" href="js/styles.css">
+  <link rel="stylesheet" href="js/styles.css?v=20260210d">
 </head>
 <body class="m-0 bg-white text-gray-800 transition-colors duration-500 ease-in-out dark:bg-black font-sans min-h-screen overflow-hidden">
 
   <!-- 新增公告背景遮罩 -->
-  <div id="announcement-backdrop" class="fixed inset-0 z-40 bg-black/30 dark:bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-in-out opacity-0 hidden"></div>
+  <div id="announcement-backdrop" class="fixed inset-0 z-40 bg-slate-200/35 dark:bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-in-out opacity-0 hidden"></div>
 
   <!-- 修改后的公告栏 -->
   <div id="announcement-banner" class="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ease-in-out opacity-0 scale-95 hidden">
@@ -164,7 +164,7 @@
   <div id="container" class="layout-shell">
     <section id="stage-panel" class="relative">
       <!-- 模型容器 -->
-      <div id="model-container" class="z-10 bg-gray-100 border border-gray-300/70 dark:bg-transparent dark:border-white/10"></div>
+      <div id="model-container" class="z-10 border border-gray-300/70 dark:border-white/10"></div>
       
       <!-- 模型标题 -->
       <div id="model-title"
@@ -358,7 +358,7 @@
             </div>
             
             <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <span><i class="fas fa-info-circle mr-1"></i>仅展示当前流行的AI大模型（信息更新至 2026.02）</span>
+              <span><i class="fas fa-info-circle mr-1"></i>支持拖动旋转与滚轮缩放模型（触控设备可双指缩放）</span>
             </div>
           </div>
         </div>
@@ -375,12 +375,12 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/utils/SkeletonUtils.js"></script>
 
   <!-- 引入自定义JS模块 -->
-  <script src="js/config.js"></script>
-  <script src="js/scene.js"></script>
-  <script src="js/modelLoader.js"></script>
-  <script src="js/contentDisplay.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/config.js?v=20260210d"></script>
+  <script src="js/scene.js?v=20260210d"></script>
+  <script src="js/modelLoader.js?v=20260210d"></script>
+  <script src="js/contentDisplay.js?v=20260210d"></script>
+  <script src="js/ui.js?v=20260210d"></script>
+  <script src="js/main.js?v=20260210d"></script>
 
   <script>
     document.addEventListener('keydown', function(event) {
