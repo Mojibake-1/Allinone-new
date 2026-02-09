@@ -5,6 +5,69 @@ let currentModel = null;  // 当前显示的模型
 let currentModelIndex = config.defaultIndex;
 let activeLoadToken = 0; // 仅允许最新一次加载请求渲染到场景
 
+function getModelMaterialTheme(isDarkMode = document.documentElement.classList.contains('dark')) {
+  return isDarkMode
+    ? {
+        metalness: 0.12,
+        roughness: 0.5,
+        envMapIntensity: 1.0,
+        normalScale: 1.0
+      }
+    : {
+        metalness: 0.06,
+        roughness: 0.36,
+        envMapIntensity: 1.35,
+        normalScale: 1.2
+      };
+}
+
+function tuneMaterialForTheme(material, profile) {
+  if (!material || !material.isMaterial) return material;
+
+  const themedMaterial = material.userData && material.userData.__themeMutable
+    ? material
+    : material.clone();
+  themedMaterial.userData = themedMaterial.userData || {};
+  themedMaterial.userData.__themeMutable = true;
+
+  if (typeof themedMaterial.metalness === 'number') {
+    themedMaterial.metalness = profile.metalness;
+  }
+  if (typeof themedMaterial.roughness === 'number') {
+    themedMaterial.roughness = profile.roughness;
+  }
+  if (typeof themedMaterial.envMapIntensity === 'number') {
+    themedMaterial.envMapIntensity = profile.envMapIntensity;
+  }
+  if (themedMaterial.normalMap && themedMaterial.normalScale && themedMaterial.normalScale.set) {
+    themedMaterial.normalScale.set(profile.normalScale, profile.normalScale);
+  }
+
+  themedMaterial.needsUpdate = true;
+  return themedMaterial;
+}
+
+function applyModelMaterialTheme(model, isDarkMode = document.documentElement.classList.contains('dark')) {
+  if (!model) return;
+  const profile = getModelMaterialTheme(isDarkMode);
+
+  model.traverse((node) => {
+    if (!node.isMesh || !node.material) return;
+
+    if (Array.isArray(node.material)) {
+      node.material = node.material.map((material) => tuneMaterialForTheme(material, profile));
+      return;
+    }
+
+    node.material = tuneMaterialForTheme(node.material, profile);
+  });
+}
+
+function refreshCurrentModelTheme(isDarkMode = document.documentElement.classList.contains('dark')) {
+  if (!currentModel) return;
+  applyModelMaterialTheme(currentModel, isDarkMode);
+}
+
 function loadModel(index) {
   const modelInfo = config.models[index];
   if (!modelInfo) return;
@@ -38,6 +101,7 @@ function loadModel(index) {
     const cloneModel = THREE.SkeletonUtils
       ? THREE.SkeletonUtils.clone(cachedModel)
       : cachedModel.clone();
+    applyModelMaterialTheme(cloneModel);
     scene.add(cloneModel);
     currentModel = cloneModel;
     return;
@@ -47,18 +111,6 @@ function loadModel(index) {
     modelInfo.file,
     function (gltf) {
       const newModel = gltf.scene;
-
-      // 调整材质
-      newModel.traverse((node) => {
-        if (node.isMesh && node.material) {
-          node.material.metalness = 0.1;
-          node.material.roughness = 0.5;
-          node.material.envMapIntensity = 1.0;
-          if (node.material.normalMap) {
-            node.material.normalScale.set(1, 1);
-          }
-        }
-      });
 
       // 自动调整模型位置和大小
       const box = new THREE.Box3().setFromObject(newModel);
@@ -86,6 +138,7 @@ function loadModel(index) {
       const cloneModel = THREE.SkeletonUtils
         ? THREE.SkeletonUtils.clone(newModel)
         : newModel.clone();
+      applyModelMaterialTheme(cloneModel);
       scene.add(cloneModel);
       currentModel = cloneModel;
     },
